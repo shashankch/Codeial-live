@@ -1,16 +1,18 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { BrowserRoute as Router, Link, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Link, Route,Switch } from 'react-router-dom';
 import { fetchPosts } from '../actions/posts';
-import { PostsList, Navbar } from './';
+import { Home, Navbar,Page404 } from './';
 import PropTypes from 'prop-types';
 
 const Login = () => <div>Login</div>;
 
 const Signup = () => <div>Signup</div>;
 
-const Home = () => <div>Home</div>;
-
+// const Home = (props) => {
+//   console.log(props);
+//   return <div>Home</div>;
+// };
 class App extends React.Component {
   componentDidMount() {
     this.props.dispatch(fetchPosts());
@@ -23,7 +25,7 @@ class App extends React.Component {
         <div>
           <Navbar />
           {/* <PostsList posts={posts} /> */}
-          <ul>
+          {/* <ul>
             <li>
               <Link to="/">Home</Link>
             </li>
@@ -33,17 +35,25 @@ class App extends React.Component {
             <li>
               <Link to="/signup">Signup</Link>
             </li>
-          </ul>
-
-          <Route exact path="/" component={Home} />
+          </ul> */}
+          <Switch>
+          <Route
+            exact
+            path="/"
+            render={(props) => {
+              return <Home {...props} posts={posts} />;
+            }}
+          />
           <Route path="/login" component={Login} />
           <Route path="/signup" component={Signup} />
+          <Route  component={Page404} />  
+          </Switch>
         </div>
       </Router>
     );
   }
 }
-
+//path matching happens line by line...
 function mapStateToProps(state) {
   return {
     posts: state.posts,
