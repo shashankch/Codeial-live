@@ -11,7 +11,7 @@ const initialAuthState = {
   inProgress: false,
 };
 
-export function auth(state = initialAuthState, action) {
+export  function auth(state = initialAuthState, action) {
   switch (action.type) {
     case LOGIN_START:
       return {
