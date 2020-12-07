@@ -5,6 +5,9 @@ import {
   SIGNUP_START,
   SIGNUP_FAILED,
   SIGNUP_SUCCESS,
+  AUTHENTICATE_USER,
+  LOG_OUT,
+  CLEAR_AUTH_STATE,
 } from './actionTypes';
 import { APIUrls } from '../helpers/urls';
 import { getFormBody } from '../helpers/utils';
@@ -24,6 +27,18 @@ export function loginSuccess(user) {
   return {
     type: LOGIN_SUCCESS,
     user,
+  };
+}
+
+export function logoutUser() {
+  return {
+    type: LOG_OUT,
+  };
+}
+
+export function clearAuthState() {
+  return {
+    type: CLEAR_AUTH_STATE,
   };
 }
 // convert to urlencoded format due to nature of api ../login?email=a@gmail.com&password=222
@@ -96,5 +111,12 @@ export function signupFailed(error) {
 export function startSignup() {
   return {
     type: SIGNUP_START,
+  };
+}
+
+export function authenticateUser(user) {
+  return {
+    type: AUTHENTICATE_USER,
+    user,
   };
 }
