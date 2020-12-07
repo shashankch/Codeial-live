@@ -43,6 +43,7 @@ export function login(email, password) {
         console.log('data', data);
         if (data.success) {
           //dispatch action to save user
+          localStorage.setItem('token', data.data.token);
           dispatch(loginSuccess(data.data.user));
           return;
         }
@@ -52,16 +53,16 @@ export function login(email, password) {
   };
 }
 
-export function signup(email, password, confirmPassword, name) {
+export function signup(email, password, confirm_password, name) {
   return (dispatch) => {
-    dispatch(startLogin());
+    //  dispatch(startLogin());
     const url = APIUrls.signup();
     fetch(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
-      body: getFormBody({ email, password, confirmPassword, name }),
+      body: getFormBody({ email, password, confirm_password, name }),
     })
       .then((response) => response.json())
       .then((data) => {
