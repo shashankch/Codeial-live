@@ -1,6 +1,12 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+
+import {
+  BrowserRouter as Router,
+  Route,
+  Switch,
+  Redirect,
+} from 'react-router-dom';
 import PropTypes from 'prop-types';
 
 import { fetchPosts } from '../actions/posts';
@@ -15,18 +21,19 @@ import {
 } from './';
 import jwtDecode from 'jwt-decode';
 import { authenticateUser } from '../actions/auth';
-import { Redirect } from 'react-router-dom';
 import { getAuthTokenFromLocalStorage } from '../helpers/utils';
 import { fetchUserFriends } from '../actions/friends';
 
 const PrivateRoute = (privateRouteProps) => {
-  const { isLoggedIn, path, component: Component } = privateRouteProps;
+  const { isLoggedin, path, component: Component } = privateRouteProps;
 
   return (
     <Route
       path={path}
       render={(props) => {
-        return isLoggedIn ? (
+        console.log('props', props);
+        console.log('isLoggedin', isLoggedin);
+        return isLoggedin ? (
           <Component {...props} />
         ) : (
           <Redirect
@@ -48,7 +55,7 @@ class App extends React.Component {
     this.props.dispatch(fetchPosts());
 
     const token = getAuthTokenFromLocalStorage();
-    console.log('token', token);
+
     if (token) {
       const user = jwtDecode(token);
 
@@ -60,6 +67,7 @@ class App extends React.Component {
           name: user.name,
         })
       );
+
       this.props.dispatch(fetchUserFriends());
     }
   }
@@ -91,12 +99,12 @@ class App extends React.Component {
             <PrivateRoute
               path="/settings"
               component={Settings}
-              isLoggedIn={auth.isLoggedIn}
+              isLoggedin={auth.isLoggedIn}
             />
             <PrivateRoute
               path="/user/:userId"
               component={UserProfile}
-              isLoggedIn={auth.isLoggedIn}
+              isLoggedin={auth.isLoggedIn}
             />
             <Route component={Page404} />
           </Switch>

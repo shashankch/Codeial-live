@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
-import { fetchUserProfile } from '../actions/profile';
-import { addFriend, removeFriend } from '../actions/friends';
 import { connect } from 'react-redux';
+import { fetchUserProfile } from '../actions/profile';
 import { APIUrls } from '../helpers/urls';
 import { getAuthTokenFromLocalStorage } from '../helpers/utils';
+import { addFriend, removeFriend } from '../actions/friends';
+
 class UserProfile extends Component {
   constructor(props) {
     super(props);
@@ -13,33 +14,51 @@ class UserProfile extends Component {
       successMessage: null,
     };
   }
-
   componentDidMount() {
     const { match } = this.props;
+
     if (match.params.userId) {
-      //dispatch an action...
+      // dispatch an action
       this.props.dispatch(fetchUserProfile(match.params.userId));
     }
   }
-  componentDidUpdate(prevProps, prevState) {
-    this.checkIfUserIsAFriend();
+
+  componentDidUpdate(prevProps) {
+    const {
+      match: { params: prevParams },
+    } = prevProps;
+
+    const {
+      match: { params: currentParams },
+    } = this.props;
+
+    if (
+      prevParams &&
+      currentParams &&
+      prevParams.userId !== currentParams.userId
+    ) {
+      this.props.dispatch(fetchUserProfile(currentParams.userId));
+    }
   }
 
   checkIfUserIsAFriend = () => {
     console.log('this.props', this.props);
     const { match, friends } = this.props;
     const userId = match.params.userId;
+
     const index = friends.map((friend) => friend.to_user._id.indexOf(userId));
-    console.log('index', index);
+
     if (index !== -1) {
       return true;
     }
+
     return false;
   };
 
   handleAddFriendClick = async () => {
     const userId = this.props.match.params.userId;
     const url = APIUrls.addFriend(userId);
+
     const options = {
       method: 'POST',
       headers: {
@@ -47,12 +66,14 @@ class UserProfile extends Component {
         Authorization: `Bearer ${getAuthTokenFromLocalStorage()}`,
       },
     };
+
     const response = await fetch(url, options);
     const data = await response.json();
+
     if (data.success) {
       this.setState({
         success: true,
-        successMessage: 'Added friend successfully',
+        successMessage: 'Added friend successfully!',
       });
 
       this.props.dispatch(addFriend(data.data.friendship));
@@ -65,24 +86,28 @@ class UserProfile extends Component {
   };
 
   handleRemoveFriendClick = async () => {
+    // Mini Assignment
     const { match } = this.props;
-
     const url = APIUrls.removeFriend(match.params.userId);
-    const options = {
+
+    const extra = {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
         Authorization: `Bearer ${getAuthTokenFromLocalStorage()}`,
       },
     };
-    const response = await fetch(url, options);
+
+    const response = await fetch(url, extra);
     const data = await response.json();
+    console.log('await data', data);
+
     if (data.success) {
+      // show user message
       this.setState({
         success: true,
         successMessage: 'Removed friends successfully!',
       });
-
       this.props.dispatch(removeFriend(match.params.userId));
     } else {
       this.setState({
@@ -93,20 +118,18 @@ class UserProfile extends Component {
   };
 
   render() {
-    console.log('props', this.props);
     const {
       match: { params },
       profile,
     } = this.props;
-    console.log('params', params);
-
+    console.log('this.props', params);
     const user = profile.user;
 
     if (profile.inProgress) {
-      return <h1>Loading...</h1>;
+      return <h1>Loading!</h1>;
     }
-    let isUserAFriend = this.checkIfUserIsAFriend();
-    console.log('isfriend', isUserAFriend);
+
+    const isUserAFriend = this.checkIfUserIsAFriend();
     const { success, error, successMessage } = this.state;
     return (
       <div className="settings">
@@ -121,6 +144,7 @@ class UserProfile extends Component {
           <div className="field-label">Name</div>
           <div className="field-value">{user.name}</div>
         </div>
+
         <div className="field">
           <div className="field-label">Email</div>
           <div className="field-value">{user.email}</div>
@@ -142,6 +166,7 @@ class UserProfile extends Component {
               Remove Friend
             </button>
           )}
+
           {success && (
             <div className="alert success-dailog">{successMessage}</div>
           )}
@@ -158,5 +183,4 @@ function mapStateToProps({ profile, friends }) {
     friends,
   };
 }
-
 export default connect(mapStateToProps)(UserProfile);
