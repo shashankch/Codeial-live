@@ -6,5 +6,20 @@ import Page404 from './Page404';
 import Login from './Login';
 import Signup from './Signup';
 import Settings from './Settings';
+import UserProfile from './UserProfile';
+import FriendsList from './FriendsList';
+import FriendsListItem from './FriendsListItem';
 
-export { App, Home, PostsList, Page404, Login, Signup, Navbar,Settings };
+export {
+  App,
+  Home,
+  PostsList,
+  Page404,
+  Login,
+  Signup,
+  Navbar,
+  Settings,
+  UserProfile,
+  FriendsList,
+  FriendsListItem,
+};
